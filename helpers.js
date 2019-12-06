@@ -8,35 +8,36 @@ const randomNumberInRange = (min, max) => {
 
 const createMockCustomer = () => {
   return {
-    customerName: `${fakeData.name.firstName()} ${fakeData.name.lastName()}`,
-    customerAddress: `${fakeData.address.streetAddress()}`
+    $customer_name: `${fakeData.name.firstName()} ${fakeData.name.lastName()}`,
+    $customer_address: `${fakeData.address.streetAddress()}`
   }
 }
 
 const createMockJob = (totalCustomers) => {
-  const rando = randomNumberInRange;
   const statuses = ['quoted', 'quote accepted', 'in progress', 'complete'];
+  const randomStatus = statuses[randomNumberInRange(0, 3)];
 
   return {
-    customerId: rando(1, totalCustomers),
-    quote: `${fakeData.commerce.price()}`,
-    jobDescription: `${fakeData.lorem.sentences()}`,
-    jobStatus: `${statuses[rando(0, 3)]}`
+    $customer_id: randomNumberInRange(1, totalCustomers),
+    $quote: `${fakeData.commerce.price()}`,
+    $job_description: `${fakeData.lorem.sentences()}`,
+    $job_status: `${randomStatus}`
   }
 }
 
 const createMockMaterial = (totalJobs) => {
-  const rando = randomNumberInRange;
   const qtyBought = fakeData.random.number();
+  const qtyUsed = qtyBought - randomNumberInRange(1, qtyBought);
 
   return {
-    job: rando(1, totalJobs),
-    name: `${fakeData.random.word()}`,
-    qty_bought: `${qtyBought}`,
-    qty_used: `${qtyBought - rando(1, qtyBought)}`,
-    cost: `${fakeData.commerce.price()}`
+    $job_id: randomNumberInRange(1, totalJobs),
+    $material_name: `${fakeData.random.word()}`,
+    $qty_bought: `${qtyBought}`,
+    $qty_used: `${qtyUsed}`,
+    $cost: `${fakeData.commerce.price()}`
   }
 }
+
 module.exports = {
   randomNumberInRange,
   createMockCustomer,

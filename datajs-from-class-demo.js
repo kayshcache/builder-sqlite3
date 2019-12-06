@@ -9,7 +9,7 @@
 const sqlite = require('sqlite3').verbose();
 const fakeData = require('faker');
 const { createMockCustomer, createMockJob, createMockMaterial } = require('./helpers');
-//const createMockCustomer = helpers.createMockCustomer;
+
 const customerTableLength = 4;
 const jobTableLength = 4;
 
@@ -20,9 +20,12 @@ const db = new sqlite.Database('./db/builder.db');
 db.serialize(function() {
   // Call functions to do stuff to the database
 
-  insertCustomer(createMockCustomer()).then(customerId => console.log('New cust: ' + customerId)).catch(err => console.log(err));
-//   insertJob(createMockJob()).then(jobId => console.log('New job: ' + jobId)).catch(err => console.log(err));
-//   insertMaterial(createMockMaterial()).then(materialId => console.log('New material: ' + materialId)).catch(err => console.log(err));
+//  insertCustomer(createMockCustomer()).then(customerId => console.log('New cust: ' + customerId)).catch(err => console.log(err));
+//   insertJob(createMockJob(customerTableLength)).then(jobId => console.log('New job: ' + jobId)).catch(err => console.log(err));
+//   insertMaterial(createMockMaterial(jobTableLength)).then(materialId => console.log('New material: ' + materialId)).catch(err => console.log(err));
+ 
+
+   insertRecord('materials', createMockMaterial(jobTableLength)).then(materialId => console.log('New material: ' + materialId)).catch(err => console.log(err));
 });
 
 // FUNCTIONS TO CREATE TABLES: functions which parameterise SQL queries and perform operation
@@ -104,44 +107,27 @@ function insertMaterial(mat) {
   });
 }
 
+function insertRecord(table, data) {
+  const parameters = data;
+  const dataKeys = Object.keys(data);
+  const dataKeysNoDollar = dataKeys.map(key => key.slice(1));
+  const sql =
+    `
+      INSERT INTO ${table}(${dataKeysNoDollar.join(', ')})
+      VALUES (${dataKeys.join(', ')});
+    `;
+
+  return new Promise ((resolve, reject) => {
+    db.run(sql, parameters, function(result, error) {
+      if(error) {
+	reject(error);
+      }
+      resolve(this.lastID);
+    });
+  });
+}
+
 
 // HELPER FUNCTIONS
-/*
-function randomNumberInRange(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function createMockCustomer() {
-  return {
-    customerName: `${fakeData.name.firstName()} ${fakeData.name.lastName()}`,
-    customerAddress: `${fakeData.address.streetAddress()}`
-  }
-}
-
-function createMockJob() {
-  const rando = randomNumberInRange;
-  const statuses = ['quoted', 'quote accepted', 'in progress', 'complete'];
-
-  return {
-    customerId: rando(1, customerTableLength),
-    quote: `${fakeData.commerce.price()}`,
-    jobDescription: `${fakeData.lorem.sentences()}`,
-    jobStatus: `${statuses[rando(0, 3)]}`
-  }
-}
-
-function createMockMaterial() {
-  const rando = randomNumberInRange;
-  const qtyBought = fakeData.random.number();
-
-  return {
-    job: rando(1, jobTableLength),
-    name: `${fakeData.random.word()}`,
-    qty_bought: `${qtyBought}`,
-    qty_used: `${qtyBought - rando(1, qtyBought)}`,
-    cost: `${fakeData.commerce.price()}`
-  }
-}*/
+// Moved to ./helper.js
 
