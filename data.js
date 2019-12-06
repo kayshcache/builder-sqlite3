@@ -8,7 +8,8 @@
 // IMPORT SQLITE3 AND FAKER: require dependencies
 const sqlite = require('sqlite3').verbose();
 const fakeData = require('faker');
-
+const { createMockCustomer, createMockJob, createMockMaterial } = require('./helpers');
+//const createMockCustomer = helpers.createMockCustomer;
 const customerTableLength = 4;
 const jobTableLength = 4;
 
@@ -19,9 +20,9 @@ const db = new sqlite.Database('./db/builder.db');
 db.serialize(function() {
   // Call functions to do stuff to the database
 
-//  insertCustomer(createMockCustomer()).then(customerId => console.log('New cust: ' + customerId)).catch(err => console.log(err));
+  insertCustomer(createMockCustomer()).then(customerId => console.log('New cust: ' + customerId)).catch(err => console.log(err));
 //   insertJob(createMockJob()).then(jobId => console.log('New job: ' + jobId)).catch(err => console.log(err));
-   insertMaterial(createMockMaterial()).then(materialId => console.log('New material: ' + materialId)).catch(err => console.log(err));
+//   insertMaterial(createMockMaterial()).then(materialId => console.log('New material: ' + materialId)).catch(err => console.log(err));
 });
 
 // FUNCTIONS TO CREATE TABLES: functions which parameterise SQL queries and perform operation
@@ -37,7 +38,8 @@ function insertCustomer(customer) {
     $customer_address: customer.customerAddress
   };
 
-  const sql = `
+  const sql = 
+  `
     INSERT INTO customers(customer_name, customer_address)
     VALUES ($customer_name, $customer_address)
   `;
@@ -104,7 +106,7 @@ function insertMaterial(mat) {
 
 
 // HELPER FUNCTIONS
-
+/*
 function randomNumberInRange(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -141,4 +143,5 @@ function createMockMaterial() {
     qty_used: `${qtyBought - rando(1, qtyBought)}`,
     cost: `${fakeData.commerce.price()}`
   }
-}
+}*/
+
