@@ -1,49 +1,51 @@
 const sqlite = require('sqlite3').verbose();
 const fakeData = require('faker');
 const { createMockCustomer, createMockJob, createMockMaterial } = require('./helpers');
-
-const customerTableLength = 4;
-const jobTableLength = 4;
+const { insertRecord, readRecords, deleteRecords } = require('./crud-operations');
 
 // INITIALISE DATABASE: initialising an object that lets you control the db
 const db = new sqlite.Database('./db/builder.db');
 
 // DATABASE COMMANDS: the place where you call functions to do db operations
 db.serialize(function() {
+  const totals = { customers: 0, jobs: 0 };
 
-  insertRecord('customers', createMockCustomer())
+  readRecords(db, 'jobs', 'COUNT(*) AS jobs')
+    .then(count => count.jobs)
+    .then(totalJobs => {
+      totals.jobs = totalJobs;
+      return 'poo';
+    })
+    .catch(err => console.log(err));
+
+  console.log(totals);
+
+  readRecords(db, 'customers', 'COUNT(*) AS customers')
+    .then(count => totals.customers = count.customers)
+    .catch(err => console.log(err));
+
+  insertRecord(db, 'customers', createMockCustomer())
     .then(customerId => console.log('New cust: ' + customerId))
     .catch(err => console.log(err));
 
-  insertRecord('jobs', createMockJob(customerTableLength))
+  insertRecord(db, 'jobs', createMockJob(totals.customers))
     .then(jobId => console.log('New job: ' + jobId))
     .catch(err => console.log(err));
 
-  insertRecord('materials', createMockMaterial(jobTableLength))
+  insertRecord(db, 'materials', createMockMaterial(totals.jobs))
     .then(materialId => console.log('New material: ' + materialId))
+    .catch(err => console.log(err));
+
+  deleteRecords(db, 'materials', 'material_id = 1')
+    .then(thisThing => console.log('This thing is a this: ' + thisThing))
     .catch(err => console.log(err));
 });
 
+db.close();
+
 // FUNCTIONS TO CREATE TABLES: functions which parameterise SQL queries and perform operation
-function insertRecord(table, data) {
-  const parameters = data;
-  const dataKeys = Object.keys(data);
-  const dataKeysNoDollar = dataKeys.map(key => key.slice(1));
-  const sql =`
-      INSERT INTO ${table}(${dataKeysNoDollar.join(', ')})
-      VALUES (${dataKeys.join(', ')});
-    `;
-
-  return new Promise ((resolve, reject) => {
-    db.run(sql, parameters, function(result, error) {
-      if(error) {
-	reject(error);
-      }
-      resolve(this.lastID);
-    });
-  });
-}
-
+// Moved to ./crud-operations.js
+//
 // HELPER FUNCTIONS
 // Moved to ./helper.js
 
