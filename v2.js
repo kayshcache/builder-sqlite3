@@ -7,22 +7,16 @@ const { insertRecord, readRecords, deleteRecords } = require('./crud-operations'
 const db = new sqlite.Database('./db/builder.db');
 
 // DATABASE COMMANDS: the place where you call functions to do db operations
-db.serialize(function() {
+db.serialize(async function() {
   const totals = { customers: 0, jobs: 0 };
-
-  readRecords(db, 'jobs', 'COUNT(*) AS jobs')
-    .then(count => count.jobs)
-    .then(totalJobs => {
-      totals.jobs = totalJobs;
-      return 'poo';
-    })
+  await readRecords(db, 'customers', 'COUNT(*) AS customers')
+    .then(count => totals.customers = count.customers)
+    .catch(err => console.log(err));
+  await readRecords(db, 'jobs', 'COUNT(*) AS jobs')
+    .then(count => totals.jobs = count.jobs)
     .catch(err => console.log(err));
 
   console.log(totals);
-
-  readRecords(db, 'customers', 'COUNT(*) AS customers')
-    .then(count => totals.customers = count.customers)
-    .catch(err => console.log(err));
 
   insertRecord(db, 'customers', createMockCustomer())
     .then(customerId => console.log('New cust: ' + customerId))
@@ -39,9 +33,9 @@ db.serialize(function() {
   deleteRecords(db, 'materials', 'material_id = 1')
     .then(thisThing => console.log('This thing is a this: ' + thisThing))
     .catch(err => console.log(err));
+
 });
 
-db.close();
 
 // FUNCTIONS TO CREATE TABLES: functions which parameterise SQL queries and perform operation
 // Moved to ./crud-operations.js

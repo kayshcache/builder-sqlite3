@@ -26,8 +26,6 @@ const createMockJob = (totalCustomers) => {
 };
 
 const createMockMaterial = (totalJobs) => {
-  console.log(totalJobs);
-  console.log(typeof totalJobs);
   const qtyBought = fakeData.random.number();
   const qtyUsed = qtyBought - randomNumberInRange(1, qtyBought);
 

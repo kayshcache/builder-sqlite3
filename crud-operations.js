@@ -1,4 +1,41 @@
+// Values that can be handled by sqlite module:
+/*
+    $customer_name
+    $customer_address
+    $customer_id
+    $quote
+    $job_description
+    $job_status
+    $job_id
+    $material_name
+    $qty_bought
+    $qty_used
+    $cost
+*/
+function prepareKeys(table, data) {
+  switch (table) {
+    case 'customers':
+      const { 
+	name: $customer_name, 
+	address: $customer_address, 
+	id: $customer_id 
+      } = data;
+      break;
+    case 'jobs':
+      const {
+	description: $job_description,
+	_status: $job_status,
+	id: $job_id,
+	quote: $quote
+      } = data;
+      break;
+    case 'materials':
+      break;
+  }
+}
+
 function insertRecord(db, table, data) {
+
   const dataKeys = Object.keys(data);
   const dataKeysNoDollar = dataKeys.map(key => key.slice(1));
   const sql =`
